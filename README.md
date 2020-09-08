@@ -1,7 +1,7 @@
 # ChallengeBackend2
 
 Your goal is to create an app using the spotify web api. You can make for example a flask or django project, it has to be able to authenticate to Spotify to fetch the new releases. Your job is to add two new features:
-- A way to fetch data from spotify’s new releases API and persist in a Postgresql DB (mandatory)
+- A way to fetch data from spotify’s new releases API (/v1/browse/new-releases) and persist in a Postgresql DB (mandatory)
 - A route : `/api/artists/` returning a JSON containing informations about artists that have released new tracks recently, from your local copy of today’s spotify’s new releases.
 
 ## Project Structure
