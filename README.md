@@ -8,7 +8,7 @@ Your goal is to create an app using the [spotify web api](https://developer.spot
 The spotify auth is provided by us: (follows spotify web api.): it is located in `spotify_auth.py`.
 The flow ends with a call to `/auth/callback/` which will give you the necessary access tokens.
 To use it, we will provide you with the necessary: CLIENT_ID and CLIENT_SECRET.
-Feel free to move it and re-organise as you please, we expect a well organised and clean code.
+Feel free to move it and re-organise as you please, we expect a well organised and clean code. Keep in mind that we want an Authorization Code Flow to see how you handle user authorization.
   
   
 ## Tech Specifications
