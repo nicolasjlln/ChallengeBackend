@@ -5,6 +5,7 @@ from challenge.models import Artist, Album
 
 
 class AlbumSerializer(serializers.ModelSerializer):
+    """ Album model Serializer. """
     class Meta:
         model = Album
         fields = [
@@ -15,15 +16,15 @@ class AlbumSerializer(serializers.ModelSerializer):
             "release_date_precision",
             "total_tracks",
         ]
-        read_only_fields = fields
+        read_only_fields = fields  # nothing can be updated manually
 
 
 class ArtistSerializer(serializers.ModelSerializer):
+    """ Artist model Serializer. """
     # Adding albums
     albums = AlbumSerializer(source="album_set", many=True)
 
     class Meta:
         model = Artist
         fields = ["name", "artist_type", "albums"]
-        read_only_fields = fields
-        depth = 1
+        read_only_fields = fields  # nothing can be updated manually

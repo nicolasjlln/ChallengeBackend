@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """groover URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -24,11 +26,8 @@ apirouter.register(r"artists", views.ArtistViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path(
-        "api-auth/", include("rest_framework.urls", namespace="rest_framework")
-    ),
-    path("api/", include((apirouter.urls, 'groover'))),
-    path("auth/callback", views.spotify_callback),
     path("", views.home),
+    path("auth/callback", views.spotify_callback),
+    path("admin/", admin.site.urls),
+    path("api/", include((apirouter.urls, 'groover-api'))),
 ]

@@ -4,8 +4,8 @@ from django.db import models
 
 #########
 # It was not possible to use a `unique_together` Meta option for the models
-# because the DB doesn not support it.
-# Then unique `slug` seamed the proper way to make records unique.
+# because the DB does not support it.
+# Then unique `slug` seamed to be the proper way to make records unique.
 #########
 
 
@@ -15,8 +15,8 @@ class AbstractSpotifyModel(models.Model):
     a `name` and an `id` fields.
     A `slug` field is built on both to differenciate records in database.
 
-    The `id` from Spotify is supposed unique, then a artist with the same `name`
-    AND `id` fields should be considered as a duplicate record.
+    The `id` from Spotify is supposed unique, then an artist with the same
+    `name` AND `id` fields should be considered as a duplicate record.
     """
     # Slug field is based on the artist name and its spotiy id
     slug = models.CharField(max_length=150, unique=True, blank=False)
