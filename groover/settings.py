@@ -22,7 +22,7 @@ os.environ["CLIENT_SECRET"] = "7555b89676e34ac69a1c32c49b3dfef6"
 # Pagination
 USE_PAGINATION = True
 ITEMS_PER_PAGE = 10
-# ################################ #
+# ######################################## #
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
