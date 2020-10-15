@@ -1,0 +1,7 @@
+*.log
+*.pot
+*.pyc
+__pycache__/
+groover-chall.sqlite3
+htmlcov
+.coverage

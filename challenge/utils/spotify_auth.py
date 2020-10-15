@@ -1,4 +1,9 @@
-import base64, json, requests, os
+# coding: utf-8
+
+import base64
+import json
+import requests
+import os
 
 
 class SpotifyAuth(object):
@@ -8,19 +13,19 @@ class SpotifyAuth(object):
     HEADER = "application/x-www-form-urlencoded"
     CLIENT_ID = os.environ.get("CLIENT_ID")
     CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-    CALLBACK_URL = "http://localhost:5000/auth"
+    CALLBACK_URL = "http://localhost:5000/auth/callback"
     SCOPE = "user-read-email user-read-private"
 
-    def getAuth(self, client_id, redirect_uri, scope):
+    def _get_auth_url(self, client_id, redirect_uri, scope):
         return (
             f"{self.SPOTIFY_URL_AUTH}"
             f"?client_id={client_id}"
             f"&redirect_uri={redirect_uri}"
             f"&scope={scope}"
-            "&response_type=code"
+            f"&response_type={self.RESPONSE_TYPE}"
         )
 
-    def getToken(self, code, client_id, client_secret, redirect_uri):
+    def get_token(self, code, client_id, client_secret, redirect_uri):
         body = {
             "grant_type": "authorization_code",
             "code": code,
@@ -29,16 +34,20 @@ class SpotifyAuth(object):
             "client_secret": client_secret,
         }
 
-        encoded = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+        encoded = base64.b64encode(
+            f"{client_id}:{client_secret}".encode()
+        ).decode()
         headers = {
             "Content-Type": self.HEADER,
             "Authorization": f"Basic {encoded}",
         }
 
-        post = requests.post(self.SPOTIFY_URL_TOKEN, params=body, headers=headers)
-        return self.handleToken(json.loads(post.text))
+        post = requests.post(
+            self.SPOTIFY_URL_TOKEN, params=body, headers=headers
+        )
+        return self.handle_token(json.loads(post.text))
 
-    def handleToken(self, response):
+    def handle_token(self, response):
         if "error" in response:
             return response
         return {
@@ -46,7 +55,7 @@ class SpotifyAuth(object):
             for key in ["access_token", "expires_in", "refresh_token"]
         }
 
-    def refreshAuth(self, refresh_token):
+    def refresh_auth(self, refresh_token):
         body = {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
         post_refresh = requests.post(
@@ -54,14 +63,19 @@ class SpotifyAuth(object):
         )
         p_back = json.dumps(post_refresh.text)
 
-        return self.handleToken(p_back)
+        return self.handle_token(p_back)
 
-    def getUser(self):
-        return self.getAuth(
-            self.CLIENT_ID, f"{self.CALLBACK_URL}/callback", self.SCOPE,
+    def get_user(self):
+        return self._get_auth_url(
+            client_id=self.CLIENT_ID,
+            redirect_uri=self.CALLBACK_URL,
+            scope=self.SCOPE,
         )
 
-    def getUserToken(self, code):
-        return self.getToken(
-            code, self.CLIENT_ID, self.CLIENT_SECRET, f"{self.CALLBACK_URL}/callback"
+    def get_user_auth(self, code):
+        return self.get_token(
+            code=code,
+            client_id=self.CLIENT_ID,
+            client_secret=self.CLIENT_SECRET,
+            redirect_uri=self.CALLBACK_URL,
         )
