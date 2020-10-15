@@ -13,9 +13,16 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+
+# ######### GROOVER APP SETTINGS ######### #
 # Add Spotify credentials as environment variables
 os.environ["CLIENT_ID"] = "e18d6952d6854b6c9ab1a161a013e6e3"
 os.environ["CLIENT_SECRET"] = "7555b89676e34ac69a1c32c49b3dfef6"
+
+# Pagination
+USE_PAGINATION = True
+ITEMS_PER_PAGE = 10
+# ################################ #
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,10 +40,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # REST FRAMEWORK
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-}
+if USE_PAGINATION:
+    REST_FRAMEWORK = {
+        'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': ITEMS_PER_PAGE
+    }
 
 
 # Application definition
