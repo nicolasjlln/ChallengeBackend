@@ -25,7 +25,7 @@ class SpotifyAuth(object):
             f"&response_type={self.RESPONSE_TYPE}"
         )
 
-    def get_token(self, code, client_id, client_secret, redirect_uri):
+    def _get_token(self, code, client_id, client_secret, redirect_uri):
         body = {
             "grant_type": "authorization_code",
             "code": code,
@@ -45,9 +45,9 @@ class SpotifyAuth(object):
         post = requests.post(
             self.SPOTIFY_URL_TOKEN, params=body, headers=headers
         )
-        return self.handle_token(json.loads(post.text))
+        return self._handle_token(json.loads(post.text))
 
-    def handle_token(self, response):
+    def _handle_token(self, response):
         if "error" in response:
             return response
         return {
@@ -63,7 +63,7 @@ class SpotifyAuth(object):
         )
         p_back = json.dumps(post_refresh.text)
 
-        return self.handle_token(p_back)
+        return self._handle_token(p_back)
 
     def get_user(self):
         return self._get_auth_url(
@@ -73,7 +73,7 @@ class SpotifyAuth(object):
         )
 
     def get_user_auth(self, code):
-        return self.get_token(
+        return self._get_token(
             code=code,
             client_id=self.CLIENT_ID,
             client_secret=self.CLIENT_SECRET,
