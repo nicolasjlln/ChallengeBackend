@@ -23,7 +23,7 @@ All stability, performance, efficiency adds-up are highly recommended.
 
 ## Requirements
 
-Python version : 3.8.X
+Python version : 3.8.X (I used 3.8.2)
 
 ## How to run server
 
