@@ -34,7 +34,7 @@ class SpotifyAuth(object):
             "client_secret": client_secret,
         }
 
-        headers = self.get_headers()
+        headers = self._get_headers()
 
         post = requests.post(
             self.SPOTIFY_URL_TOKEN, params=body, headers=headers
@@ -62,7 +62,7 @@ class SpotifyAuth(object):
     def refresh_auth(self, refresh_token):
         body = {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
-        headers = self.get_headers()
+        headers = self._get_headers()
 
         post_refresh = requests.post(
             self.SPOTIFY_URL_TOKEN, data=body, headers=headers
