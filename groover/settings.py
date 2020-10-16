@@ -26,6 +26,7 @@ ITEMS_PER_PAGE = 10
 # /!\ NB : defaut port is modified in `manage.py` to 5000
 # ######################################## #
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,9 +38,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "1knyg@0!sx(8e(^0+3ajswawok8q03-ka$$$ls*m@qi=o67o)2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # REST FRAMEWORK
 if USE_PAGINATION:
