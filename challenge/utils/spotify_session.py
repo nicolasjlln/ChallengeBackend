@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from dateutils import relativedelta
-from . import spotify_auth
+from challenge.utils import spotify_auth
 
 
 class SpotifySession:
@@ -21,5 +21,5 @@ class SpotifySession:
         self.refresh_token = refresh_token
 
     def refresh_auth_token(self):
-        session_infos = spotify_auth.refresh_token(self.refresh_token)
+        session_infos = spotify_auth.refresh_auth(refresh_token=self.refresh_token)
         self._refresh_session(**session_infos)

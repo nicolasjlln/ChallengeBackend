@@ -31,7 +31,7 @@ class SpotifySessionTestCase(TestCase):
         """Only one artist created."""
         now = datetime.utcnow()
 
-        fake_auth.refresh_token = MagicMock(
+        fake_auth.refresh_auth = MagicMock(
             return_value={
                 "access_token": "any",
                 "expires_in": 0,
@@ -47,8 +47,8 @@ class SpotifySessionTestCase(TestCase):
             session.refresh_auth_token()
 
         # check results
-        fake_auth.refresh_token.assert_called_once_with(
-            self.session.refresh_token
+        fake_auth.refresh_auth.assert_called_once_with(
+            refresh_token=self.session.refresh_token
         )
         self.assertEquals(session.token, "any")
         self.assertEquals(session.expiry_date, now)
