@@ -18,17 +18,19 @@ class AbstractSpotifyModel(models.Model):
     The `id` from Spotify is supposed unique, then an artist with the same
     `name` AND `id` fields should be considered as a duplicate record.
     """
+
     # Slug field is based on the artist name and its spotiy id
     slug = models.CharField(max_length=150, unique=True, blank=False)
     name = models.CharField(max_length=100, blank=False)
 
     class Meta:
         abstract = True
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Artist(AbstractSpotifyModel):
     """ Artist model """
+
     artist_type = models.CharField(max_length=100)
 
     def __str__(self):
@@ -37,6 +39,7 @@ class Artist(AbstractSpotifyModel):
 
 class Album(AbstractSpotifyModel):
     """ Album model """
+
     album_type = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
     release_date = models.CharField(max_length=50)

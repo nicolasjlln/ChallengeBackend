@@ -6,6 +6,7 @@ from challenge.models import Artist, Album
 
 class AlbumSerializer(serializers.ModelSerializer):
     """ Album model Serializer. """
+
     class Meta:
         model = Album
         fields = [
@@ -21,6 +22,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 class ArtistSerializer(serializers.ModelSerializer):
     """ Artist model Serializer. """
+
     # Adding albums
     albums = AlbumSerializer(source="album_set", many=True)
 

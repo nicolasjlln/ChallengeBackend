@@ -8,6 +8,7 @@ from django.db import transaction
 
 class ArtistTestCase(TestCase):
     """ Tests about Artist model. """
+
     def setUp(self):
         Artist.objects.create(
             name="any_artist", slug="slug-test-12345", artist_type="artist"
@@ -48,6 +49,7 @@ class ArtistTestCase(TestCase):
 
 class AlbumsTestCase(TestCase):
     """ Tests about Album model. """
+
     def test_album_creation_from_artist(self):
         artist = Artist.objects.create(
             name="any_artist", slug="slug-test-12345", artist_type="artist"
@@ -91,7 +93,7 @@ class AlbumsTestCase(TestCase):
             name="name",
             release_date="any",
             release_date_precision="any",
-            total_tracks=1
+            total_tracks=1,
         )
         with self.assertRaises(IntegrityError):
             # otherwise other queries won't work because of the thrown exception
@@ -103,7 +105,7 @@ class AlbumsTestCase(TestCase):
                     type="type",
                     release_date="any",
                     release_date_precision="any",
-                    total_tracks=1
+                    total_tracks=1,
                 )
 
         try:
@@ -114,7 +116,7 @@ class AlbumsTestCase(TestCase):
                 type="type",
                 release_date="any",
                 release_date_precision="any",
-                total_tracks=1
+                total_tracks=1,
             )
         except Exception as e:
             self.fail(e)

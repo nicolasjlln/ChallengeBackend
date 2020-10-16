@@ -5,8 +5,7 @@ import requests
 from functools import wraps
 
 from challenge.models import Artist, Album
-from .spotify_session import SpotifySession
-from .models import slugify_model
+from challenge.utils import SpotifySession, spotify_auth, slugify_model
 
 import logging
 
@@ -40,6 +39,12 @@ class SpotifyConnector:
     def __init__(self, session: SpotifySession):
         """ Inits connector with user session. """
         self.session = session
+
+    @classmethod
+    def from_usercode(cls, code):
+        session_infos = spotify_auth.get_user_auth(code=code)
+        session = SpotifySession(**session_infos)
+        return cls(session=session)
 
     @check_token_expiry
     def get_new_releases(self):

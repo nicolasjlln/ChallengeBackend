@@ -1,7 +1,15 @@
-from .spotify_connector import SpotifyConnector
-from .spotify_session import SpotifySession
-from .spotify_auth import SpotifyAuth
+from .spotify_auth_utils import SpotifyAuth
 
-spotify_auth = SpotifyAuth()
+spotify_auth = SpotifyAuth()  # Used by other scripts imported after
 
-__all__ = ["SpotifyConnector", "SpotifySession", "spotify_auth"]
+from .spotify_session import SpotifySession  # NOQA
+from .models import slugify_model  # NOQA
+from .spotify_connector import SpotifyConnector  # NOQA
+
+
+__all__ = [
+    "spotify_auth",
+    "SpotifyConnector",
+    "SpotifySession",
+    "slugify_model",
+]

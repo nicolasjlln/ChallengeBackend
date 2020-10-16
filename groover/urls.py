@@ -26,8 +26,8 @@ apirouter.register(r"artists", views.ArtistViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path("", views.home),
+    path("", views.HomeRedirect.as_view()),
     path("auth/callback", views.spotify_callback),
     path("admin/", admin.site.urls),
-    path("api/", include((apirouter.urls, 'groover-api'))),
+    path("api/", include((apirouter.urls, "groover-api"))),
 ]

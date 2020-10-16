@@ -1,32 +1,25 @@
 # coding: utf-8
 
-from django.shortcuts import redirect  # , render
-
-from .utils import spotify_auth, SpotifySession, SpotifyConnector
+import logging
 
 from rest_framework import viewsets
-from challenge.serializers import (
-    ArtistSerializer,
-)
-from challenge.models import Artist
+from django.shortcuts import redirect
+from django.views.generic.base import RedirectView
 
-import logging
+from challenge.serializers import ArtistSerializer
+from challenge.models import Artist
+from .utils import spotify_auth, SpotifyConnector
+
 
 logger = logging.getLogger(__name__)
 
-
-class ArtistViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that retreive artists informations about its new releases on
-    spotify.
-    """
-    queryset = Artist.objects.all()
-    serializer_class = ArtistSerializer
+USER_AUTH_URL = spotify_auth.get_user()
 
 
-def home(request):
+class HomeRedirect(RedirectView):
     """ This is home page. User get to Spotify auth page directly. """
-    return redirect(spotify_auth.get_user())
+
+    url = USER_AUTH_URL
 
 
 def spotify_callback(request):
@@ -39,12 +32,19 @@ def spotify_callback(request):
 
     if not code:
         logger.error("No code found in Spotify API callback. Retrying.")
-        return redirect(spotify_auth.get_user())
+        return redirect(USER_AUTH_URL)
 
-    session_infos = spotify_auth.get_user_auth(code=code)
-    session = SpotifySession(**session_infos)
-
-    spotify_conn = SpotifyConnector(session=session)
+    spotify_conn = SpotifyConnector.from_usercode(code=code)
     spotify_conn.get_new_releases()
 
-    return redirect('/api/')
+    return redirect("/api/")
+
+
+class ArtistViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that retreive artists informations about its new releases on
+    spotify.
+    """
+
+    queryset = Artist.objects.all()
+    serializer_class = ArtistSerializer
