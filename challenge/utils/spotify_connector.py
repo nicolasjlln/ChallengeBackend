@@ -2,7 +2,9 @@
 
 from datetime import datetime
 import requests
+import threading
 from functools import wraps
+import time
 
 from challenge.models import Artist, Album
 from challenge.utils import SpotifySession, spotify_auth, slugify_model
@@ -63,13 +65,26 @@ class SpotifyConnector:
         database.
         """
         next_url = self.NEW_RELEASES_URL
+        threads = list()
         while next_url:
             albumns_infos = self._retreive_new_releases(url=next_url)
+
             next_url = albumns_infos.pop("next")
-            self._extract_albums_data(albums=albumns_infos.get("items"))
+
+            # Async data import
+            thread = threading.Thread(
+                target=self._extract_albums_data,
+                kwargs={'albums': albumns_infos.get("items")}
+            )
+            thread.start()
+            threads.append(thread)
+
+        # Wait until all imports are done
+        for thread in threads:
+            thread.join()
 
     def _retreive_new_releases(self, url: str):
-        response = self.__perform_request(url=url)
+        response = self.__perform_request(url=url, limit=50)
 
         if response.status_code != 200:
             raise RuntimeError(
@@ -79,10 +94,11 @@ class SpotifyConnector:
 
         return response.json().get("albums")
 
-    def __perform_request(self, url: str):
+    def __perform_request(self, url: str, **params):
         """ Performs requests with right authentication headers. """
         return requests.get(
             url=url,
+            params=params,
             headers={"Authorization": f"Bearer {self.session.token}"},
         )
 
