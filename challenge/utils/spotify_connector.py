@@ -3,6 +3,7 @@
 import requests
 from datetime import datetime
 from functools import wraps
+from retrying import retry
 
 from challenge.utils import SpotifySession, spotify_auth
 
@@ -24,6 +25,14 @@ def check_token_expiry(func: callable):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def retry_if_requests_exception(exception):
+    """
+    True if we should retry (in this case when it's an RequestException)
+    False otherwise
+    """
+    return isinstance(exception, requests.exceptions.RequestException)
 
 
 class SpotifyConnector:
@@ -80,6 +89,11 @@ class SpotifyConnector:
 
         return response.json().get("albums")
 
+    @retry(
+        retry_on_exception=retry_if_requests_exception,
+        stop_max_delay=10000,
+        stop_max_attempt_number=7,
+    )
     def __perform_request(self, url: str, **params):
         """ Performs requests with right authentication headers. """
         return requests.get(

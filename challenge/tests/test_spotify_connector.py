@@ -9,6 +9,8 @@ from unittest.mock import patch, MagicMock
 from challenge.utils import SpotifyConnector, SpotifySession
 from challenge.models import Album, Artist
 
+from requests.exceptions import Timeout, TooManyRedirects, RequestException
+
 
 TESTS_PATH = Path().cwd() / "challenge" / "tests"
 
@@ -76,6 +78,45 @@ class SpotifyConnectorTestCase(TestCase):
         # Assert connector logs at ERROR level if token is expired
         with self.assertLogs(level="ERROR"):
             conn.get_new_releases()
+
+    def test_retrying_on_requests_exception(self, fake_requests):
+        fake_response = MagicMock()
+        side_effects = [
+            Timeout(),
+            TooManyRedirects(),
+            RequestException(),
+            fake_response,  # should not involve a retry
+        ]
+        fake_requests.get = MagicMock(side_effect=side_effects)
+        fake_requests.exceptions.RequestException = RequestException
+
+        conn = SpotifyConnector(session=MagicMock())
+        try:
+            result = conn._SpotifyConnector__perform_request(url="any")
+        except Exception as e:
+            self.fail(f"Should not catch exception during request : {e}")
+
+        self.assertEquals(result, fake_response)
+
+    def test_exception_on_requests_too_many_retries(self, fake_requests):
+        side_effects = [RequestException()] * 10  # Should stop retrying
+        fake_requests.get = MagicMock(side_effect=side_effects)
+        fake_requests.exceptions.RequestException = RequestException
+
+        conn = SpotifyConnector(session=MagicMock())
+        with self.assertRaises(RequestException):
+            with self.assertLogs(level="ERROR"):
+                conn._SpotifyConnector__perform_request(url="any")
+
+    def test_exception_raised_if_not_requests_exception(self, fake_requests):
+        side_effect = KeyError()  # Should stop retrying
+        fake_requests.get = MagicMock(side_effect=side_effect)
+        fake_requests.exceptions.RequestException = RequestException
+
+        conn = SpotifyConnector(session=MagicMock())
+        with self.assertRaises(KeyError):
+            with self.assertLogs(level="ERROR"):
+                conn._SpotifyConnector__perform_request(url="any")
 
     def tearDown(self):
         Artist.objects.all().delete()
