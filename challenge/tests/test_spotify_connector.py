@@ -3,7 +3,6 @@
 import json
 from pathlib import Path
 from datetime import datetime
-from dateutils import relativedelta
 
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
@@ -53,7 +52,8 @@ class SpotifyConnectorTestCase(TestCase):
 
         # Mocking requests response
         fake_response = MagicMock()
-        fake_response.json = MagicMock(return_value=self.FAKE_DATA)
+        empty_data = {"albums": {"items": [], "next": None}}
+        fake_response.json = MagicMock(return_value=empty_data)
         fake_response.status_code = 200
         fake_requests.get = MagicMock(return_value=fake_response)
 
@@ -64,8 +64,8 @@ class SpotifyConnectorTestCase(TestCase):
         fake_session.refresh_auth_token.assert_called_once()
         fake_requests.get.assert_called_once()
 
-        self.assertEquals(Artist.objects.count(), 5)
-        self.assertEquals(Album.objects.count(), 2)
+        self.assertEquals(Artist.objects.count(), 0)  # check empty data
+        self.assertEquals(Album.objects.count(), 0)  # check empty data
 
     def test_get_new_releases_exception_happens(self, fake_requests):
         """ Checks if session token is properly handled. """
@@ -76,3 +76,7 @@ class SpotifyConnectorTestCase(TestCase):
         # Assert connector logs at ERROR level if token is expired
         with self.assertLogs(level="ERROR"):
             conn.get_new_releases()
+
+    def tearDown(self):
+        Artist.objects.all().delete()
+        Album.objects.all().delete()

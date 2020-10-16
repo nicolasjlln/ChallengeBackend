@@ -65,23 +65,10 @@ class SpotifyConnector:
         database.
         """
         next_url = self.NEW_RELEASES_URL
-        threads = list()
         while next_url:
             albumns_infos = self._retreive_new_releases(url=next_url)
-
             next_url = albumns_infos.pop("next")
-
-            # Async data import
-            thread = threading.Thread(
-                target=self._extract_albums_data,
-                kwargs={'albums': albumns_infos.get("items")}
-            )
-            thread.start()
-            threads.append(thread)
-
-        # Wait until all imports are done
-        for thread in threads:
-            thread.join()
+            self._extract_albums_data(albums=albumns_infos.get("items"))
 
     def _retreive_new_releases(self, url: str):
         response = self.__perform_request(url=url, limit=50)

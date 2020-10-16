@@ -121,6 +121,9 @@ class AlbumsTestCase(TestCase):
         except Exception as e:
             self.fail(e)
 
-    def tearDown(self):
+    def remove_all(self):
         Artist.objects.all().delete()
         Album.objects.all().delete()
+
+    def tearDown(self):
+        self.remove_all()

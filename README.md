@@ -39,6 +39,11 @@ Python version : 3.8.X
     $ python manage.py migrate
     ```
 
+- [OPTIONAL] Run tests :
+    ``` bash
+    $ python manage.py test
+    ```
+
 - Start app :
     ``` bash
     $ python manage.py runserver 0.0.0.0:5000
