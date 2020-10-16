@@ -21,6 +21,10 @@ Feel free to move it and re-organise as you please, we expect a well organised a
 
 All stability, performance, efficiency adds-up are highly recommended.
 
+## Requirements
+
+Python version : 3.8.X
+
 ## How to run server
 
 - If needed, start a virtualenv ([virtualenv doc](https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html))
@@ -32,7 +36,6 @@ All stability, performance, efficiency adds-up are highly recommended.
 
 - Setup app :
     ``` bash
-    $ python manage.py makemigrations
     $ python manage.py migrate
     ```
 
