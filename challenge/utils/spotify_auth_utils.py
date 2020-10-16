@@ -34,13 +34,7 @@ class SpotifyAuth(object):
             "client_secret": client_secret,
         }
 
-        encoded = base64.b64encode(
-            f"{client_id}:{client_secret}".encode()
-        ).decode()
-        headers = {
-            "Content-Type": self.HEADER,
-            "Authorization": f"Basic {encoded}",
-        }
+        headers = self.get_headers()
 
         post = requests.post(
             self.SPOTIFY_URL_TOKEN, params=body, headers=headers
@@ -55,11 +49,23 @@ class SpotifyAuth(object):
             for key in ["access_token", "expires_in", "refresh_token"]
         }
 
+    def _get_headers(self):
+        encoded = base64.b64encode(
+            f"{self.CLIENT_ID}:{self.CLIENT_SECRET}".encode()
+        ).decode()
+
+        return {
+            "Content-Type": self.HEADER,
+            "Authorization": f"Basic {encoded}",
+        }
+
     def refresh_auth(self, refresh_token):
         body = {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
+        headers = self.get_headers()
+
         post_refresh = requests.post(
-            self.SPOTIFY_URL_TOKEN, data=body, headers=self.HEADER
+            self.SPOTIFY_URL_TOKEN, data=body, headers=headers
         )
         p_back = json.dumps(post_refresh.text)
 

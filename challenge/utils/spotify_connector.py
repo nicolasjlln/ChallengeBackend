@@ -18,7 +18,7 @@ def check_token_expiry(func: callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
         session = args[0].session
-        if datetime.now() >= session.expiry_date:
+        if datetime.utcnow() >= session.expiry_date:
             logger.warning("User session token expired, refreshing.")
             session.refresh_auth_token()
 
