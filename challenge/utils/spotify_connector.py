@@ -1,13 +1,10 @@
 # coding: utf-8
 
-from datetime import datetime
 import requests
-import threading
+from datetime import datetime
 from functools import wraps
-import time
 
-from challenge.models import Artist, Album
-from challenge.utils import SpotifySession, spotify_auth, slugify_model
+from challenge.utils import SpotifySession, spotify_auth
 
 import logging
 
@@ -64,11 +61,13 @@ class SpotifyConnector:
         Requests new releases (albums) from Spotify API and store it in
         database.
         """
+        from challenge.models import Album
+
         next_url = self.NEW_RELEASES_URL
         while next_url:
             albumns_infos = self._retreive_new_releases(url=next_url)
             next_url = albumns_infos.pop("next")
-            self._extract_albums_data(albums=albumns_infos.get("items"))
+            Album.save_albums(albums=albumns_infos.get("items"))
 
     def _retreive_new_releases(self, url: str):
         response = self.__perform_request(url=url, limit=50)
@@ -87,43 +86,4 @@ class SpotifyConnector:
             url=url,
             params=params,
             headers={"Authorization": f"Bearer {self.session.token}"},
-        )
-
-    def _extract_albums_data(self, albums: list):
-        """ Identify albums and artists while redirecting data for storage. """
-        for album in albums:
-            artists_id = self._save_artists(artists_data=album.get("artists"))
-            self._save_album(album_data=album, artists_by_name=artists_id)
-
-    def _save_artists(self, artists_data: list) -> dict:
-        """ Extract artists from given data and store them in database. """
-        artists = dict()
-        for artist_data in artists_data:
-            artist, _ = Artist.objects.get_or_create(
-                slug=slugify_model(model=artist_data),
-                name=artist_data.get("name"),
-                artist_type=artist_data.get("type"),
-            )
-
-            # Storing artist id by name
-            artists[artist.name] = artist.id
-
-        return artists
-
-    def _save_album(self, album_data: dict, artists_by_name: dict):
-        """ Extract albums from given data and store them in database. """
-        album, _ = Album.objects.get_or_create(
-            slug=slugify_model(model=album_data),
-            name=album_data.get("name"),
-            album_type=album_data.get("album_type"),
-            type=album_data.get("type"),
-            release_date=album_data.get("release_date"),
-            release_date_precision=album_data.get("release_date_precision"),
-            total_tracks=album_data.get("total_tracks"),
-        )
-        album.artists.add(
-            *[
-                artists_by_name[artist["name"]]
-                for artist in album_data.get("artists", [])
-            ]
         )

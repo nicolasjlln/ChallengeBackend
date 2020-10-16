@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.db import models
+from challenge.utils import slugify_model
 
 #########
 # It was not possible to use a `unique_together` Meta option for the models
@@ -48,3 +49,45 @@ class Album(AbstractSpotifyModel):
 
     # Many to many key with Artist model
     artists = models.ManyToManyField(Artist)
+
+    @classmethod
+    def save_albums(cls, albums):
+        """ Identify albums and artists while redirecting data for storage. """
+        for album in albums:
+            artists_id = cls._save_artists(artists_data=album.get("artists"))
+            cls._save_album(album_data=album, artists_by_name=artists_id)
+
+    @classmethod
+    def _save_artists(cls, artists_data: list) -> dict:
+        """ Extract artists from given data and store them in database. """
+        artists = dict()
+        for artist_data in artists_data:
+            artist, _ = Artist.objects.get_or_create(
+                slug=slugify_model(model=artist_data),
+                name=artist_data.get("name"),
+                artist_type=artist_data.get("type"),
+            )
+
+            # Storing artist id by name
+            artists[artist.name] = artist.id
+
+        return artists
+
+    @classmethod
+    def _save_album(cls, album_data: dict, artists_by_name: dict):
+        """ Extract albums from given data and store them in database. """
+        album, _ = cls.objects.get_or_create(
+            slug=slugify_model(model=album_data),
+            name=album_data.get("name"),
+            album_type=album_data.get("album_type"),
+            type=album_data.get("type"),
+            release_date=album_data.get("release_date"),
+            release_date_precision=album_data.get("release_date_precision"),
+            total_tracks=album_data.get("total_tracks"),
+        )
+        album.artists.add(
+            *[
+                artists_by_name[artist["name"]]
+                for artist in album_data.get("artists", [])
+            ]
+        )
